@@ -28,17 +28,29 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import manga.Sources
 import java.net.URL
 
 val currentTheme = darkColors()
 
 @ExperimentalKeyInput
 @ExperimentalMaterialApi
-fun main() = Window(title = "NineAnime Viewer", centered = true) {
+fun main() = Window(title = "Otaku Viewer") {
+    MaterialTheme(colors = currentTheme) {
+        Row(Modifier.background(currentTheme.background)) {
+            Button(onClick = { uiViewer(Sources.NINE_ANIME) }) { Text("Manga") }
+            Button(onClick = { uiViewer(anime.Sources.GOGOANIME) }) { Text("Anime") }
+        }
+    }
+}
+
+@ExperimentalKeyInput
+@ExperimentalMaterialApi
+fun uiViewer(info: GenericInfo) = Window(title = "NineAnime Viewer", centered = true) {
     var textValue by remember { mutableStateOf(TextFieldValue("")) }
     var page = 1
     var progressAlpha by remember { mutableStateOf(1f) }
-    var currentList by remember { mutableStateOf(Sources.NINE_ANIME.getManga(page).toMutableList()) }
+    var currentList by remember { mutableStateOf(info.getItems(page).toMutableList()) }
     MaterialTheme(colors = currentTheme) {
         Column(Modifier.background(currentTheme.background)) {
             TextField(
@@ -80,14 +92,14 @@ fun main() = Window(title = "NineAnime Viewer", centered = true) {
 
 @ExperimentalMaterialApi
 @Composable
-fun MangaItem(item: MangaModel) {
+fun MangaItem(item: GenericData) {
     Card(
         shape = RoundedCornerShape(4.dp),
         border = cardBorder(),
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable { GlobalScope.launch { MangaInfo(item.toInfoModel()) } }
+            .clickable { GlobalScope.launch { item.listOfData?.let { MangaInfo(it) } } }
     ) {
         Text(
             item.title,
@@ -104,7 +116,7 @@ const val WIDTH_DEFAULT = 360 / 2
 const val HEIGHT_DEFAULT = 480 / 2
 
 @ExperimentalMaterialApi
-fun MangaInfo(item: MangaInfoModel) = GlobalScope.launch {
+fun MangaInfo(item: GenericInformation) = GlobalScope.launch {
     Window(title = item.title) {
         MaterialTheme(colors = currentTheme) {
             Box {
@@ -118,7 +130,7 @@ fun MangaInfo(item: MangaInfoModel) = GlobalScope.launch {
 }
 
 @Composable
-fun MangaTitleArea(item: MangaInfoModel) = Card(modifier = Modifier.padding(5.dp), border = cardBorder()) {
+fun MangaTitleArea(item: GenericInformation) = Card(modifier = Modifier.padding(5.dp), border = cardBorder()) {
     Row(modifier = Modifier.padding(5.dp)) {
         Image(
             bitmap = org.jetbrains.skija.Image.makeFromEncoded(
@@ -138,19 +150,19 @@ fun MangaTitleArea(item: MangaInfoModel) = Card(modifier = Modifier.padding(5.dp
             ScrollableRow(modifier = Modifier.padding(5.dp)) {
                 item.genres.forEach { Text(it, modifier = Modifier.padding(5.dp), style = MaterialTheme.typography.subtitle2) }
             }
-            ScrollableColumn { Text(item.description, style = MaterialTheme.typography.body1) }
+            ScrollableColumn { Text(item.description.orEmpty(), style = MaterialTheme.typography.body1) }
         }
     }
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun MangaChapterRows(item: MangaInfoModel) = LazyColumnFor(item.chapters, modifier = Modifier.fillMaxHeight()) {
+fun MangaChapterRows(item: GenericInformation) = LazyColumnFor(item.rowData(), modifier = Modifier.fillMaxHeight()) {
     Card(
         modifier = Modifier
             .padding(5.dp)
             .fillMaxWidth()
-            .clickable { MangaReader(it, it.name) },
+            .clickable { MangaReader(it.getItem(), it.name) },
         border = cardBorder()
     ) {
         Column(modifier = Modifier.padding(5.dp)) {
@@ -160,7 +172,7 @@ fun MangaChapterRows(item: MangaInfoModel) = LazyColumnFor(item.chapters, modifi
     }
 }
 
-fun MangaReader(model: ChapterModel, title: String) = Window(title = title) {
+fun MangaReader(model: List<String>, title: String) = Window(title = title) {
     var alpha by remember { mutableStateOf(1f) }
     var pageList by remember { mutableStateOf(emptyList<ImageBitmap>()) }
     MaterialTheme {
@@ -173,8 +185,7 @@ fun MangaReader(model: ChapterModel, title: String) = Window(title = title) {
 
     GlobalScope.launch {
         val pages = withContext(Dispatchers.Default) {
-            model.getPageInfo()
-                .pages
+            model
                 .also { println(it) }
                 .map { org.jetbrains.skija.Image.makeFromEncoded(URL(it).openConnection().getInputStream().readAllBytes()).asImageBitmap() }
         }

@@ -1,0 +1,4 @@
+package anime
+
+class AnimeUi {
+}

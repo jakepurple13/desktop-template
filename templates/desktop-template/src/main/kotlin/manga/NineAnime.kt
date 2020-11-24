@@ -1,3 +1,7 @@
+package manga
+
+import GenericData
+import GenericInformation
 import org.jsoup.Jsoup
 import java.net.URI
 import java.net.URISyntaxException
@@ -31,6 +35,8 @@ object NineAnime : MangaSource {
     } catch (e: Exception) {
         super.searchManga(searchText, pageNumber, mangaList)
     }
+
+    override fun getItems(page: Int): List<GenericData> = getManga(page)
 
     override fun getManga(pageNumber: Int): List<MangaModel> =
         Jsoup.connect("$url/category/index_$pageNumber.html?sort=updated").followRedirects(true).get()

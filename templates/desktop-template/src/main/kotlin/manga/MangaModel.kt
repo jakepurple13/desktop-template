@@ -1,4 +1,11 @@
-interface MangaSource {
+package manga
+
+import GenericData
+import GenericInfo
+import GenericInformation
+import RowData
+
+interface MangaSource : GenericInfo {
     val websiteUrl: String
     val hasMorePages: Boolean
     val headers: List<Pair<String, String>> get() = emptyList()
@@ -11,25 +18,29 @@ interface MangaSource {
 }
 
 data class MangaModel(
-    val title: String,
+    override val title: String,
     val description: String,
     val mangaUrl: String,
     val imageUrl: String,
     val source: Sources
-) {
+) : GenericData(title, mangaUrl) {
     internal val extras = mutableMapOf<String, Any>()
     fun toInfoModel() = source.toInfoModel(this)
+
+    override val listOfData: GenericInformation? get() = toInfoModel()
 }
 
 data class MangaInfoModel(
-    val title: String,
-    val description: String,
+    override val title: String,
+    override val description: String,
     val mangaUrl: String,
-    val imageUrl: String,
+    override val imageUrl: String,
     val chapters: List<ChapterModel>,
-    val genres: List<String>,
+    override val genres: List<String>,
     val alternativeNames: List<String>
-)
+): GenericInformation(title, mangaUrl, imageUrl, description, genres) {
+    override fun rowData(): List<RowData> = chapters.map { RowData(it.name, it.uploaded) { it.getPageInfo().pages } }
+}
 
 data class ChapterModel(
     val name: String,
