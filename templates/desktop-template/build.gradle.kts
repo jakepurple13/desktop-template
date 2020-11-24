@@ -15,6 +15,8 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("org.jsoup:jsoup:1.13.1")
 }
 
 compose.desktop {
