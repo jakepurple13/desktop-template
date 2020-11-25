@@ -18,6 +18,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("org.jsoup:jsoup:1.13.1")
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    //compileOnly(group = "uk.co.caprica", name = "vlcj", version = "5.0.0")
+    //implementation("uk.co.caprica:vlcj:4.7.0")
+    //implementation("tk.ivybits.javi:java:+")
+    compileOnly(group = "javax.media", name = "jmf", version = "2.1.1e")
 }
 
 compose.desktop {

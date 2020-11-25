@@ -3,6 +3,7 @@ package manga
 import GenericData
 import GenericInfo
 import GenericInformation
+import GenericUi
 import RowData
 
 interface MangaSource : GenericInfo {
@@ -38,7 +39,7 @@ data class MangaInfoModel(
     val chapters: List<ChapterModel>,
     override val genres: List<String>,
     val alternativeNames: List<String>
-): GenericInformation(title, mangaUrl, imageUrl, description, genres) {
+): GenericInformation(title, mangaUrl, imageUrl, description, genres), GenericUi by MangaUi {
     override fun rowData(): List<RowData> = chapters.map { RowData(it.name, it.uploaded) { it.getPageInfo().pages } }
 }
 

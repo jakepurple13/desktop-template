@@ -3,6 +3,7 @@ package anime
 import GenericData
 import GenericInfo
 import GenericInformation
+import GenericUi
 import RowData
 import manga.NineAnime
 import org.jsoup.Jsoup
@@ -22,7 +23,7 @@ data class Episode(
     val image: String?,
     override val genres: List<String>,
     val episodes: List<EpisodeInfo>
-) : GenericInformation(name, source.url, image, description, genres) {
+) : GenericInformation(name, source.url, image, description, genres), GenericUi by AnimeUi {
 
     override fun rowData(): List<RowData> =
         episodes.map { RowData(it.name, it.url) { Sources.GOGOANIME.getVideoLink(it).map { it.link.orEmpty() } } }
