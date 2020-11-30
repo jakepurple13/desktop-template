@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.awt.Desktop
@@ -38,10 +39,10 @@ import manga.Sources as MSources
 fun main() = Window(title = "Otaku Viewer") {
     val theme = remember { mutableStateOf(darkColors()) }
     var checked by remember { mutableStateOf(false) }
-    val showDialog = remember { mutableStateOf(false) }
+    /*val showDialog = remember { mutableStateOf(false) }
     if (showDialog.value) {
         SourceDialog(theme, MSources.values(), showDialog)
-    }
+    }*/
     MaterialTheme(colors = theme.value) {
         Column {
             Row(Modifier.background(theme.value.background).fillMaxWidth().padding(top = 5.dp)) {
@@ -73,7 +74,7 @@ fun main() = Window(title = "Otaku Viewer") {
                 )
             }
             Row(Modifier.background(theme.value.background).wrapContentSize()) {
-                Button(
+                OutlinedButton(
                     modifier = Modifier
                         .background(theme.value.background, shape = RoundedCornerShape(5.dp))
                         .padding(5.dp)
@@ -82,7 +83,7 @@ fun main() = Window(title = "Otaku Viewer") {
                     onClick = { uiViewer(MSources.NINE_ANIME, "Manga", theme) },
                     colors = ButtonConstants.defaultButtonColors(backgroundColor = theme.value.surface)
                 ) { Text("Manga", style = MaterialTheme.typography.h1) }
-                Button(
+                OutlinedButton(
                     modifier = Modifier
                         .background(theme.value.background, shape = RoundedCornerShape(5.dp))
                         .padding(5.dp)
